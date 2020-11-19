@@ -14,6 +14,7 @@
 #include "Randomize.hh"
 #include "G4PhysListFactory.hh"
 #include "G4StepLimiterPhysics.hh"
+
 #include <getopt.h>
 
 // #ifdef G4MULTITHREADED
@@ -34,20 +35,10 @@
 int main(int argc,char** argv)
 {
 
-    int getopt_char;
-    int getopt_idx;
-
-    G4UIExecutive* ui = 0;
-    if ( argc == 1 ) {
-      ui = new G4UIExecutive(argc, argv);
-    }
-    G4cout<<argv[0];
-    G4cout<<"\n"<<argv[1];
-
     //Parse command line arguments
 
     DetectorConstruction* detector;
-    G4double   x=4.0;
+    //G4double   x=4.0; //unused and unobvious what it is
     G4double   beam_energy         = 150.0*MeV;
     G4double   beam_sigma_x        = 3.0*mm;
     G4double   beam_sigma_y        = 3.0*mm;
@@ -59,7 +50,7 @@ int main(int argc,char** argv)
     G4double   gun_z_position      = -1.0*mm;
     G4bool     collimator          = false;
     G4double   collimator_radius   = 3.0*mm;
-    G4double   max_step_lenght     = 0.2*mm;
+    G4double   max_step_length     = 0.2*mm;
     G4bool     useGUI              = false;
 
   if(collimator)
@@ -72,165 +63,202 @@ int main(int argc,char** argv)
    }
 
 
-   // static struct option long_options[] = {
-   //                                        {"energy",                    required_argument, NULL, 'e'   },
-   //                                        {"alphax",                    required_argument, NULL, 'ax'  },
-   //                                        {"betax",                     required_argument, NULL, 'bx'  },
-   //                                        {"sizex",                     required_argument, NULL, 'sx'  },
-   //                                        {"alphay",                    required_argument, NULL, 'ay'  },
-   //                                        {"betay",                     required_argument, NULL, 'by'  },
-   //                                        {"sizey",                     required_argument, NULL, 'sy'  },
-   //                                        {"number",                    required_argument, NULL, 'n'   },
-   //                                        {"step",                      required_argument, NULL, 'l'   },
-   //                                        {"gui",                       no_argument,       NULL, 'g'   },
-   //                                        {"col",                       no_argument,       NULL, 'c'   },
-   //                                        {"colrad",                    required_argument, NULL, 'r'   },
-   //                                        {0,0,0,0}
-   // };
-   //
-   // while ( (getopt_char = getopt_long(argc,argv, "e:ax:ay:bx:by:l:n:sx:sy:r:gc", long_options, &getopt_idx)) != -1) {
-   //     switch(getopt_char) {
-   //
-   //     case 'g': //Use GUI
-   //         useGUI = true;
-   //         break;
-   //
-   //     case 'c': //Collimator On/Off
-   //         collimator = true;
-   //         break;
-   //
-   //
-   //     case 'e': //Beam Energy
-   //         try
-   //         {
-   //           beam_energy = std::stod(std::string(optarg));
-   //         }
-   //         catch (const std::invalid_argument& ia) {
-   //             G4cout << "Invalid argument when reading beam energy" << G4endl
-   //                    << "Got: '" << optarg << "'" << G4endl
-   //                    << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
-   //             exit(1);
-   //         }
-   //         break;
-   //
-   //     case 'ax': //Beam Alpha(x)
-   //         try {
-   //             beam_alpha_x  = std::stod(std::string(optarg));
-   //         }
-   //         catch (const std::invalid_argument& ia) {
-   //             G4cout << "Invalid argument when reading Alpha(x)" << G4endl
-   //                    << "Got: '" << optarg << "'" << G4endl
-   //                    << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
-   //             exit(1);
-   //         }
-   //         break;
-   //
-   //     case 'ay': //Beam Alpha(y)
-   //         try {
-   //             beam_alpha_y  = std::stod(std::string(optarg));
-   //         }
-   //         catch (const std::invalid_argument& ia) {
-   //             G4cout << "Invalid argument when reading Alpha(y)" << G4endl
-   //                    << "Got: '" << optarg << "'" << G4endl
-   //                    << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
-   //             exit(1);
-   //         }
-   //         break;
-   //
-   //     case 'bx': //Beam Beta(x)
-   //         try {
-   //             beam_beta_x = std::stod(std::string(optarg));
-   //         }
-   //         catch (const std::invalid_argument& ia) {
-   //             G4cout << "Invalid argument when reading Beta(x)" << G4endl
-   //                    << "Got: '" << optarg << "'" << G4endl
-   //                    << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
-   //             exit(1);
-   //         }
-   //         break;
-   //
-   //     case 'by': //Beam Beta(y)
-   //         try {
-   //             beam_beta_y = std::stod(std::string(optarg));
-   //         }
-   //         catch (const std::invalid_argument& ia) {
-   //             G4cout << "Invalid argument when reading Beta(y)" << G4endl
-   //                    << "Got: '" << optarg << "'" << G4endl
-   //                    << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
-   //             exit(1);
-   //         }
-   //         break;
-   //
-   //     case 'n': //Number of Particle
-   //         try {
-   //             num_particle = std::stod(std::string(optarg));
-   //         }
-   //         catch (const std::invalid_argument& ia) {
-   //             G4cout << "Invalid argument when reading number of particles" << G4endl
-   //                    << "Got: '" << optarg << "'" << G4endl
-   //                    << "Expected a integer number! (exponential notation is accepted)" << G4endl;
-   //             exit(1);
-   //         }
-   //         break;
-   //
-   //     case 'sx': //Beam Sigma(x)
-   //         try {
-   //             beam_sigma_x = std::stod(std::string(optarg));
-   //         }
-   //         catch (const std::invalid_argument& ia) {
-   //             G4cout << "Invalid argument when reading beam sigma(x)" << G4endl
-   //                    << "Got: '" << optarg << "'" << G4endl
-   //                    << "Expected a integer number! (exponential notation is accepted)" << G4endl;
-   //             exit(1);
-   //         }
-   //         break;
-   //
-   //     case 'sy': //Beam Sigma(y)
-   //         try {
-   //             beam_sigma_y = std::stod(std::string(optarg));
-   //         }
-   //         catch (const std::invalid_argument& ia) {
-   //             G4cout << "Invalid argument when reading beam sigma(y)" << G4endl
-   //                    << "Got: '" << optarg << "'" << G4endl
-   //                    << "Expected a integer number! (exponential notation is accepted)" << G4endl;
-   //             exit(1);
-   //         }
-   //         break;
-   //
-   //
-   //     case 'l': // Maximum step lenght
-   //         try {
-   //             max_step_lenght = std::stod(std::string(optarg));
-   //         }
-   //         catch (const std::invalid_argument& ia) {
-   //             G4cout << "Invalid argument when reading beam step limit" << G4endl
-   //                    << "Got: '" << optarg << "'" << G4endl
-   //                    << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
-   //             exit(1);
-   //         }
-   //         break;
-   //
-   //     case 'r': // Maximum step lenght
-   //         try {
-   //             collimator_radius = std::stod(std::string(optarg));
-   //         }
-   //         catch (const std::invalid_argument& ia) {
-   //             G4cout << "Invalid argument when reading collimator radius" << G4endl
-   //                    << "Got: '" << optarg << "'" << G4endl
-   //                    << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
-   //             exit(1);
-   //         }
-   //         break;
-   //     }
-   // }
-   //
-   // int argc_effective = argc-optind+1;
-   // char** argv_effective = new char*[argc_effective];
-   // argv_effective[0] = argv[0]; //First arg is always executable name
-   // for (int i = optind; i < argc;i++){
-   //     argv_effective[i+1-optind] = argv[i];
-   // }
+   static struct option long_options[] = {
+                                          {"energy",                    required_argument, NULL, 'e'   },
+                                          {"alphax",                    required_argument, NULL, 'a'   },
+                                          {"betax",                     required_argument, NULL, 'b'   },
+                                          {"sizex",                     required_argument, NULL, 's'   },
+                                          {"alphay",                    required_argument, NULL, 1000  },
+                                          {"betay",                     required_argument, NULL, 1001  },
+                                          {"sizey",                     required_argument, NULL, 1002  },
+                                          {"number",                    required_argument, NULL, 'n'   },
+                                          {"step",                      required_argument, NULL, 'l'   },
+                                          {"gui",                       no_argument,       NULL, 'g'   },
+                                          {"col",                       no_argument,       NULL, 'c'   },
+                                          {"colrad",                    required_argument, NULL, 'r'   },
+                                          {0,0,0,0}
+   };
 
+   int getopt_char;
+   int getopt_idx;
+   
+   while ( (getopt_char = getopt_long(argc,argv, "e:a:b:l:n:s:r:gc", long_options, &getopt_idx)) != -1) {
+       switch(getopt_char) {
+   
+       case 'g': //Use GUI
+           useGUI = true;
+           break;
+   
+       case 'c': //Collimator On/Off
+           collimator = true;
+           break;
+   
+   
+       case 'e': //Beam Energy
+           try
+           {
+             beam_energy = std::stod(std::string(optarg))*MeV;
+           }
+           catch (const std::invalid_argument& ia) {
+               G4cout << "Invalid argument when reading beam energy" << G4endl
+                      << "Got: '" << optarg << "'" << G4endl
+                      << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
+               exit(1);
+           }
+           break;
+   
+       case 'a': //Beam Alpha(x)
+           try {
+               beam_alpha_x  = std::stod(std::string(optarg));
+           }
+           catch (const std::invalid_argument& ia) {
+               G4cout << "Invalid argument when reading Alpha(x)" << G4endl
+                      << "Got: '" << optarg << "'" << G4endl
+                      << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
+               exit(1);
+           }
+           break;
+   
+       case 1000: //Beam Alpha(y)
+           try {
+               beam_alpha_y  = std::stod(std::string(optarg));
+           }
+           catch (const std::invalid_argument& ia) {
+               G4cout << "Invalid argument when reading Alpha(y)" << G4endl
+                      << "Got: '" << optarg << "'" << G4endl
+                      << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
+               exit(1);
+           }
+           break;
+   
+       case 'b': //Beam Beta(x)
+           try {
+               beam_beta_x = std::stod(std::string(optarg))*m;
+           }
+           catch (const std::invalid_argument& ia) {
+               G4cout << "Invalid argument when reading Beta(x)" << G4endl
+                      << "Got: '" << optarg << "'" << G4endl
+                      << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
+               exit(1);
+           }
+           break;
+   
+       case 1001: //Beam Beta(y)
+           try {
+               beam_beta_y = std::stod(std::string(optarg))*m;
+           }
+           catch (const std::invalid_argument& ia) {
+               G4cout << "Invalid argument when reading Beta(y)" << G4endl
+                      << "Got: '" << optarg << "'" << G4endl
+                      << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
+               exit(1);
+           }
+           break;
+   
+       case 'n': //Number of Particle
+           try {
+               num_particle = std::stod(std::string(optarg));
+           }
+           catch (const std::invalid_argument& ia) {
+               G4cout << "Invalid argument when reading number of particles" << G4endl
+                      << "Got: '" << optarg << "'" << G4endl
+                      << "Expected a integer number! (exponential notation is accepted)" << G4endl;
+               exit(1);
+           }
+           break;
+   
+       case 's': //Beam Sigma(x)
+           try {
+               beam_sigma_x = std::stod(std::string(optarg))*mm;
+           }
+           catch (const std::invalid_argument& ia) {
+               G4cout << "Invalid argument when reading beam sigma(x)" << G4endl
+                      << "Got: '" << optarg << "'" << G4endl
+                      << "Expected a integer number! (exponential notation is accepted)" << G4endl;
+               exit(1);
+           }
+           break;
+   
+       case 1002: //Beam Sigma(y)
+           try {
+               beam_sigma_y = std::stod(std::string(optarg))*mm;
+           }
+           catch (const std::invalid_argument& ia) {
+               G4cout << "Invalid argument when reading beam sigma(y)" << G4endl
+                      << "Got: '" << optarg << "'" << G4endl
+                      << "Expected a integer number! (exponential notation is accepted)" << G4endl;
+               exit(1);
+           }
+           break;
+   
+   
+       case 'l': // Maximum step length
+           try {
+               max_step_length = std::stod(std::string(optarg))*mm;
+           }
+           catch (const std::invalid_argument& ia) {
+               G4cout << "Invalid argument when reading beam step limit" << G4endl
+                      << "Got: '" << optarg << "'" << G4endl
+                      << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
+               exit(1);
+           }
+           break;
+   
+       case 'r': // Collimator radius
+           try {
+               collimator_radius = std::stod(std::string(optarg))*mm;
+           }
+           catch (const std::invalid_argument& ia) {
+               G4cout << "Invalid argument when reading collimator radius" << G4endl
+                      << "Got: '" << optarg << "'" << G4endl
+                      << "Expected a floating point number! (exponential notation is accepted)" << G4endl;
+               exit(1);
+           }
+           break;
+
+       default: // A WTF happened -- detect it otherwise things can go wrong later...
+           G4cout << "Got an unknown getopt_char '" << char(getopt_char) << "' ("<< getopt_char<<")"
+                  << " when parsing command line arguments." << G4endl;
+           exit(1);
+       }
+   }
+
+   //For debugging, print currently gotten arguments
+   G4cout << "*** Got args: ***" <<G4endl;
+   G4cout << "beam_energy       = " << beam_energy/MeV           << " [MeV]" << "\t\t (-e / --energy)" << G4endl;
+   G4cout << "beam_sigma_x      = " << beam_sigma_x/mm           << " [mm]"  << "\t\t (-s / --sizex)"  << G4endl;
+   G4cout << "beam_sigma_y      = " << beam_sigma_y/mm           << " [mm]"  << "\t\t (--sizey)"       << G4endl;
+   G4cout << "beam_alpha_x      = " << beam_alpha_x                          << "\t\t (-a / --alphax)" << G4endl;
+   G4cout << "beam_alpha_y      = " << beam_alpha_y                          << "\t\t (--alphay)"      << G4endl;
+   G4cout << "beam_beta_x       = " << beam_beta_x/m             << " [m]"   << "\t\t (-b / --betax)"  << G4endl;
+   G4cout << "beam_beta_y       = " << beam_beta_y/m             << " [m]"   << "\t\t (--betay)"       << G4endl;
+   G4cout << "num_particle      = " << num_particle                          << "\t\t (-n / --number)" << G4endl;
+   G4cout << "gun_z_position    = " << gun_z_position/mm         << " [mm]"  << "\t\t (not an arg)"    << G4endl;
+   G4cout << "collimator        = " << (collimator?"true":"false")           << "\t\t (not an arg)"    << G4endl;
+   G4cout << "collimator_radius = " << collimator_radius/mm      << " [mm]"  << "\t\t (-r / --colrad)" << G4endl;
+   G4cout << "max_step_length   = " << max_step_length/mm        << " [mm]"  << "\t\t (-l / --step)"   << G4endl;
+   G4cout << "useGUI            = " << (useGUI?"true":"false")               << "\t\t (-g / --gui)"    << G4endl;  
+   G4cout << G4endl;
+
+   
+   // Send only what was not taken by getopt_long onwards to G4UIexecutive
+   int argc_effective = argc-optind+1;
+   char** argv_effective = new char*[argc_effective];
+   argv_effective[0] = argv[0]; //First arg is always executable name; this should be copied
+   for (int i = optind; i < argc;i++){
+       argv_effective[i+1-optind] = argv[i];
+   }
+
+   G4UIExecutive* ui = 0;
+   if ( argc_effective == 1 ) {
+     ui = new G4UIExecutive(argc_effective, argv_effective);
+   }
+   else if (argc_effective > 1) {
+     G4cout<<argv_effective[0] <<"\n";
+     G4cout<<argv_effective[1]; // Don't print this one unless we actually know that it is safe...
+   }
+
+   
   // Choose the Random engine
   G4Random::setTheSeed(time(NULL));
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
@@ -248,7 +276,7 @@ int main(int argc,char** argv)
   // Detector construction
   detector = new DetectorConstruction(collimator,
                                       collimator_radius,
-                                      max_step_lenght);
+                                      max_step_length);
   runManager->SetUserInitialization(detector);
   // Physics list
   G4PhysListFactory physListFactory;
@@ -266,7 +294,7 @@ int main(int argc,char** argv)
                                                              beam_beta_y,
                                                              collimator,
                                                              collimator_radius,
-                                                             max_step_lenght,
+                                                             max_step_length,
                                                              gun_z_position));
 
 
