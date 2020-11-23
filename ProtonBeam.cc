@@ -81,19 +81,19 @@ int main(int argc,char** argv)
 
    int getopt_char;
    int getopt_idx;
-   
+
    while ( (getopt_char = getopt_long(argc,argv, "e:a:b:l:n:s:r:gc", long_options, &getopt_idx)) != -1) {
        switch(getopt_char) {
-   
+
        case 'g': //Use GUI
            useGUI = true;
            break;
-   
+
        case 'c': //Collimator On/Off
            collimator = true;
            break;
-   
-   
+
+
        case 'e': //Beam Energy
            try
            {
@@ -106,7 +106,7 @@ int main(int argc,char** argv)
                exit(1);
            }
            break;
-   
+
        case 'a': //Beam Alpha(x)
            try {
                beam_alpha_x  = std::stod(std::string(optarg));
@@ -118,7 +118,7 @@ int main(int argc,char** argv)
                exit(1);
            }
            break;
-   
+
        case 1000: //Beam Alpha(y)
            try {
                beam_alpha_y  = std::stod(std::string(optarg));
@@ -130,7 +130,7 @@ int main(int argc,char** argv)
                exit(1);
            }
            break;
-   
+
        case 'b': //Beam Beta(x)
            try {
                beam_beta_x = std::stod(std::string(optarg))*m;
@@ -142,7 +142,7 @@ int main(int argc,char** argv)
                exit(1);
            }
            break;
-   
+
        case 1001: //Beam Beta(y)
            try {
                beam_beta_y = std::stod(std::string(optarg))*m;
@@ -154,7 +154,7 @@ int main(int argc,char** argv)
                exit(1);
            }
            break;
-   
+
        case 'n': //Number of Particle
            try {
                num_particle = std::stod(std::string(optarg));
@@ -166,7 +166,7 @@ int main(int argc,char** argv)
                exit(1);
            }
            break;
-   
+
        case 's': //Beam Sigma(x)
            try {
                beam_sigma_x = std::stod(std::string(optarg))*mm;
@@ -178,7 +178,7 @@ int main(int argc,char** argv)
                exit(1);
            }
            break;
-   
+
        case 1002: //Beam Sigma(y)
            try {
                beam_sigma_y = std::stod(std::string(optarg))*mm;
@@ -190,8 +190,8 @@ int main(int argc,char** argv)
                exit(1);
            }
            break;
-   
-   
+
+
        case 'l': // Maximum step length
            try {
                max_step_length = std::stod(std::string(optarg))*mm;
@@ -203,7 +203,7 @@ int main(int argc,char** argv)
                exit(1);
            }
            break;
-   
+
        case 'r': // Collimator radius
            try {
                collimator_radius = std::stod(std::string(optarg))*mm;
@@ -216,10 +216,10 @@ int main(int argc,char** argv)
            }
            break;
 
-       default: // A WTF happened -- detect it otherwise things can go wrong later...
-           G4cout << "Got an unknown getopt_char '" << char(getopt_char) << "' ("<< getopt_char<<")"
-                  << " when parsing command line arguments." << G4endl;
-           exit(1);
+       // default: // A WTF happened -- detect it otherwise things can go wrong later...
+       //     G4cout << "Got an unknown getopt_char '" << char(getopt_char) << "' ("<< getopt_char<<")"
+       //            << " when parsing command line arguments." << G4endl;
+       //     exit(1);
        }
    }
 
@@ -237,10 +237,10 @@ int main(int argc,char** argv)
    G4cout << "collimator        = " << (collimator?"true":"false")           << "\t\t (not an arg)"    << G4endl;
    G4cout << "collimator_radius = " << collimator_radius/mm      << " [mm]"  << "\t\t (-r / --colrad)" << G4endl;
    G4cout << "max_step_length   = " << max_step_length/mm        << " [mm]"  << "\t\t (-l / --step)"   << G4endl;
-   G4cout << "useGUI            = " << (useGUI?"true":"false")               << "\t\t (-g / --gui)"    << G4endl;  
+   G4cout << "useGUI            = " << (useGUI?"true":"false")               << "\t\t (-g / --gui)"    << G4endl;
    G4cout << G4endl;
 
-   
+
    // Send only what was not taken by getopt_long onwards to G4UIexecutive
    int argc_effective = argc-optind+1;
    char** argv_effective = new char*[argc_effective];
@@ -258,7 +258,7 @@ int main(int argc,char** argv)
      G4cout<<argv_effective[1]; // Don't print this one unless we actually know that it is safe...
    }
 
-   
+
   // Choose the Random engine
   G4Random::setTheSeed(time(NULL));
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
@@ -298,7 +298,6 @@ int main(int argc,char** argv)
                                                              gun_z_position));
 
 
-
   // Initialize visualization
   G4VisManager* visManager = new G4VisExecutive;
   visManager->Initialize();
@@ -316,6 +315,7 @@ int main(int argc,char** argv)
   }
   else {
     // interactive mode
+
     UImanager->ApplyCommand("/control/execute init_vis.mac");
     // UImanager->ApplyCommand("/run/beamOn 100");
     ui->SessionStart();

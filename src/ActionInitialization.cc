@@ -10,6 +10,7 @@
 #include "globals.hh"
 
 
+
 ActionInitialization::ActionInitialization(G4double   beam_energy_input,
                                            G4double   beam_sigma_x_input,
                                            G4double   beam_sigma_y_input,
