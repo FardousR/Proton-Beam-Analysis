@@ -81,8 +81,11 @@ int main(int argc,char** argv)
 
    int getopt_char;
    int getopt_idx;
+   extern int optopt;
 
-   while ( (getopt_char = getopt_long(argc,argv, "e:a:b:l:n:s:r:gc", long_options, &getopt_idx)) != -1) {
+   while ( (getopt_char = getopt_long(argc,argv, ":e:a:b:l:n:s:r:gc", long_options, &getopt_idx)) != -1) {
+     // Note: optstring starts with a ":" in order to give useful feedback if argument is missing.
+     
        switch(getopt_char) {
 
        case 'g': //Use GUI
@@ -216,10 +219,27 @@ int main(int argc,char** argv)
            }
            break;
 
-       // default: // A WTF happened -- detect it otherwise things can go wrong later...
-       //     G4cout << "Got an unknown getopt_char '" << char(getopt_char) << "' ("<< getopt_char<<")"
-       //            << " when parsing command line arguments." << G4endl;
-       //     exit(1);
+     //Error handling:
+       case ':': // Missing argument
+	 G4cout << "One of the given options expected an argument, but it was missing." << G4endl;
+	 if ( isalpha(optopt) ) {
+	   G4cout << "The option was: '" << char(optopt) << "'" << G4endl;
+	 }
+	 exit(1);
+	 break;
+
+       case '?': // Unknown argument
+	 G4cout << "One of the given optios are unknown to getopt" << G4endl;
+	 if ( isalpha(optopt) ) {
+	   G4cout << "The option was: '" << char(optopt) << "'" << G4endl;
+	 }
+	 exit(1);
+	 break;
+	 
+       default: // Something bad happened -- detect it now, otherwise things can go wrong later, and it will be hard to debug.
+	 G4cout << "Internal error: getopt_long recognized the flag '" << char(getopt_char) << "' ("<< getopt_char<<"), but the switch/case did not." << G4endl;
+	 exit(1);
+	 
        }
    }
 
