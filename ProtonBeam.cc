@@ -46,7 +46,7 @@ int main(int argc,char** argv)
     G4double   beam_alpha_y        = 0.0;
     G4double   beam_beta_x         = 0.82*m;
     G4double   beam_beta_y         = 0.82*m;
-    G4int      num_particle        = 100;
+    G4int      num_particle        = 100; // Tip: You may want to set this one to 0, so that you can look at the geometry without particles...
     G4double   gun_z_position      = -1.0*mm;
     G4bool     collimator          = false;
     G4double   collimator_radius   = 3.0*mm;
@@ -265,19 +265,22 @@ int main(int argc,char** argv)
    int argc_effective = argc-optind+1;
    char** argv_effective = new char*[argc_effective];
    argv_effective[0] = argv[0]; //First arg is always executable name; this should be copied
-   for (int i = optind; i < argc;i++){
-       argv_effective[i+1-optind] = argv[i];
+   for (int i = optind; i < argc; i++){
+       argv_effective[i+1-optind] = argv[i];       
+   }
+   G4cout << "*** EFFECTIVE ARGS (program name + whatever follows ' -- ' after the optargs): ***" << G4endl;
+   for (int i = 0; i < argc_effective; i++) {
+     G4cout << "["<<i<<"]: " <<argv_effective[i] << G4endl;
+   }
+   if (argc_effective > 2) {
+     G4cout << "Warning: Arguments after #[1] are ignored..." << G4endl;
+     G4cout << "First effective argument used for macro to run." << G4endl;
    }
 
-   G4UIExecutive* ui = 0;
-   if ( argc_effective == 1 ) {
+   G4UIExecutive* ui = NULL;
+   if (useGUI) {
      ui = new G4UIExecutive(argc_effective, argv_effective);
    }
-   else if (argc_effective > 1) {
-     G4cout<<argv_effective[0] <<"\n";
-     G4cout<<argv_effective[1]; // Don't print this one unless we actually know that it is safe...
-   }
-
 
   // Choose the Random engine
   G4Random::setTheSeed(time(NULL));
@@ -298,13 +301,18 @@ int main(int argc,char** argv)
                                       collimator_radius,
                                       max_step_length);
   runManager->SetUserInitialization(detector);
+
   // Physics list
   G4PhysListFactory physListFactory;
   const G4String phylistname = "QGSP_BIC_EMY";
   G4VModularPhysicsList* physicsList = physListFactory.GetReferencePhysList(phylistname);
   physicsList->RegisterPhysics(new G4StepLimiterPhysics());
   runManager->SetUserInitialization(physicsList);
-  // User action initialization
+  // TODO HERE: SET DEFAULT CUTOFF VALUE!!!
+  
+  // User action initialization, i.e. set filenames etc.
+  // Geant4 then seems to call Build() automatically here,
+  //  generating primaryGeneratorAction/runAction/eventAction/steppingAction
   runManager->SetUserInitialization(new ActionInitialization(beam_energy,
                                                              beam_sigma_x,
                                                              beam_sigma_y,
@@ -317,7 +325,9 @@ int main(int argc,char** argv)
                                                              max_step_length,
                                                              gun_z_position));
 
-
+  //Initialize G4 kernel
+  runManager->Initialize();
+  
   // Initialize visualization
   G4VisManager* visManager = new G4VisExecutive;
   visManager->Initialize();
@@ -329,26 +339,22 @@ int main(int argc,char** argv)
 
   if ( ! ui ) {
     // batch mode
-    G4String command = "/control/execute ";
-    G4String fileName = argv[1];
-    UImanager->ApplyCommand(command+fileName);
+    if (argc_effective > 1) {
+      UImanager->ApplyCommand("/control/execute " + std::string(argv_effective[1]));
+    }
+    if (num_particle > 0) {
+      UImanager->ApplyCommand("/run/beamOn " + std::to_string(num_particle));
+    }
   }
   else {
-    // interactive mode
-
+    // interactive (GUI) mode
     UImanager->ApplyCommand("/control/execute init_vis.mac");
-    // UImanager->ApplyCommand("/run/beamOn 100");
+    if (num_particle > 0) {
+      UImanager->ApplyCommand("/run/beamOn " + std::to_string(num_particle));
+    }
     ui->SessionStart();
     delete ui;
   }
-
-  // else{
-  //   // interactive mode
-  //   UImanager->ApplyCommand("/control/execute init_vis.mac");
-  //   UImanager->ApplyCommand("/run/beamOn 100");
-  //   ui->SessionStart();
-  //   delete ui;
-  // }
 
   // Job termination
   // Free the store: user actions, physics_list and detector_description are
