@@ -13,7 +13,7 @@ def Testt(alpha, beta):
     print(alpha+beta)
 
 def plotRoot1DHistogram():
-    DataFile = ROOT.TFile("/home/fardousr/Desktop/Output/Energy_150_Alpha:_x_4.0_y_4.0_Beta:_x_800.0mm_y_800.0mm_y_.root")
+    DataFile = ROOT.TFile("/home/fardousr/Desktop/Output/Convergent_Data/High energy 350MeV/Energy_350_Alpha:_10._Beta:_1010.mm_Sigma_15.mm.root")
     hist = DataFile.Get('ProtonEnergyHisto').Project3D("yz")
     can1 = TCanvas( 'c1', 'Deterministic LET', 200, 10, 2400, 1500)
     can1 = TCanvas( 'can1', 'Longitudinal Energy Deposition by All Partiicles', 800, 500 )
@@ -45,8 +45,17 @@ def BraggPeakEnergyList(min, max, numBeam):
     energy = (depth/alpha)**(1/p)
     return energy
 
-def Test(alpha, beta):
-    print(alpha*beta)
+def Energy2Range(E):
+    alpha = 1.9*10**-3
+    p = 1.8
+    proton_range = alpha*E**p
+    return(proton_range)
+
+def Range2Energy(R):
+    alpha = 1.9*10**-3
+    p = 1.8
+    energy = (R/alpha)**(1/p)
+    return(energy)
 
 def RBEMatrix(file):
     RBE_min = 1
