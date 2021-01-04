@@ -55,13 +55,14 @@ int main(int argc,char** argv)
 
   if(collimator)
     {
-        gun_z_position = -800.00*mm;
+        gun_z_position      = -800.00*mm;
+        beam_sigma_x        = collimator_radius*mm;
+        beam_sigma_y        = collimator_radius*mm;
+        beam_alpha_x        = 0.0;
+        beam_alpha_y        = 0.0;
+        beam_beta_x         = 18.8*m;
+        beam_beta_y         = 18.8*m;
     }
-  else
-   {
-       gun_z_position = - 0.1*mm;
-   }
-
 
    static struct option long_options[] = {
                                           {"energy",                    required_argument, NULL, 'e'   },
@@ -85,7 +86,7 @@ int main(int argc,char** argv)
 
    while ( (getopt_char = getopt_long(argc,argv, ":e:a:b:l:n:s:r:gc", long_options, &getopt_idx)) != -1) {
      // Note: optstring starts with a ":" in order to give useful feedback if argument is missing.
-     
+
        switch(getopt_char) {
 
        case 'g': //Use GUI
@@ -235,11 +236,11 @@ int main(int argc,char** argv)
 	 }
 	 exit(1);
 	 break;
-	 
+
        default: // Something bad happened -- detect it now, otherwise things can go wrong later, and it will be hard to debug.
 	 G4cout << "Internal error: getopt_long recognized the flag '" << char(getopt_char) << "' ("<< getopt_char<<"), but the switch/case did not." << G4endl;
 	 exit(1);
-	 
+
        }
    }
 
@@ -266,7 +267,7 @@ int main(int argc,char** argv)
    char** argv_effective = new char*[argc_effective];
    argv_effective[0] = argv[0]; //First arg is always executable name; this should be copied
    for (int i = optind; i < argc; i++){
-       argv_effective[i+1-optind] = argv[i];       
+       argv_effective[i+1-optind] = argv[i];
    }
    G4cout << "*** EFFECTIVE ARGS (program name + whatever follows ' -- ' after the optargs): ***" << G4endl;
    for (int i = 0; i < argc_effective; i++) {
@@ -309,7 +310,7 @@ int main(int argc,char** argv)
   physicsList->RegisterPhysics(new G4StepLimiterPhysics());
   runManager->SetUserInitialization(physicsList);
   // TODO HERE: SET DEFAULT CUTOFF VALUE!!!
-  
+
   // User action initialization, i.e. set filenames etc.
   // Geant4 then seems to call Build() automatically here,
   //  generating primaryGeneratorAction/runAction/eventAction/steppingAction
@@ -327,7 +328,7 @@ int main(int argc,char** argv)
 
   //Initialize G4 kernel
   runManager->Initialize();
-  
+
   // Initialize visualization
   G4VisManager* visManager = new G4VisExecutive;
   visManager->Initialize();

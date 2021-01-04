@@ -81,7 +81,7 @@ def RBEMatrix(file):
         RBE.append(RBE_value)
         depth.append(LET.GetXaxis().GetBinCenter(j))
 
-    RBE2D = TH2D("LET2D", "LET2D", 800, 0, 200, 200, -50, 50)
+    RBE2D = TH2D("LET2D", "LET2D", 800, 0, 200, 200, 0, 50)
 
     for i in range(1,801):
         y=RBE[i-1]
