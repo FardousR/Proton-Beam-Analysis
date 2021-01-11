@@ -13,17 +13,23 @@
 #include "G4SystemOfUnits.hh"
 
 
-RunAction::RunAction(G4String output) : G4UserRunAction(), OutputFile(output)
+RunAction::RunAction(G4String output, G4double beam_energy_input) : G4UserRunAction(), OutputFile(output), Energy(beam_energy_input)
 {
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
     analysisManager->SetVerboseLevel(1);
 
-    G4double x_num   = 200,   x_min   = -50,  x_max   = 50;
-    G4double y_num   = 200,   y_min   = -50,  y_max   = 50;
-    G4double z_num   = 800,   z_min   = 0.0,  z_max   = 200;
-    G4double r_num   = 200,   r_min   = 0.0,  r_max   = 50;
-    G4double KE_num  = 160,   KE_min  = 0.0,  KE_max  = 160000000;
-    G4double LET_num = 200,   LET_min = 0.0,  LET_max = 10.0;
+    G4double alpha = 1.9*pow(10, -3);
+    G4double p = 1.8;
+    G4double range = alpha*pow(1.1*Energy, p);
+
+    G4int max_depth = (G4int)(range * 10)+10;
+
+    G4double x_num   = 1000,   x_min   = -50,  x_max   = 50;
+    G4double y_num   = 200,    y_min   = -50,  y_max   = 50;
+    G4double z_num   = 800,    z_min   = 0.0,  z_max   = 200;
+    G4double r_num   = 500,    r_min   = 0.0,  r_max   = 50;
+    G4double KE_num  = 160,    KE_min  = 0.0,  KE_max  = 160000000;
+    G4double LET_num = 200,    LET_min = 0.0,  LET_max = 10.0;
 
     //AllEnergyHistoID       =  analysisManager->CreateH3("AllEnergyHisto", "Energy Deposition by Particles",    400, -200.0, 200.0, 400, -200.0, 200.0, 200, 0., 200.0);
     ProtonEnergyHistoID      =  analysisManager->CreateH3("ProtonEnergyHisto", "Energy Deposition(Proton)",

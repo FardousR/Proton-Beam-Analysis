@@ -12,7 +12,7 @@ class G4Run;
 class RunAction : public G4UserRunAction
 {
   public:
-    RunAction(G4String output);
+    RunAction(G4String output,  G4double beam_energy_input);
     virtual ~RunAction();
 
     // virtual G4Run* GenerateRun();
@@ -77,6 +77,7 @@ class RunAction : public G4UserRunAction
     G4int ProtonKEHistoID;
 
     G4String OutputFile;
+    G4double Energy;
 };
 
 #endif

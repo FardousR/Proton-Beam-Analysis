@@ -10,7 +10,6 @@
 #include "globals.hh"
 
 
-
 ActionInitialization::ActionInitialization(G4double   beam_energy_input,
                                            G4double   beam_sigma_x_input,
                                            G4double   beam_sigma_y_input,
@@ -37,7 +36,7 @@ ActionInitialization::ActionInitialization(G4double   beam_energy_input,
 
   if(collimator_input)
   {
-    output_location = "/home/fardousr/Desktop/Output/Collimator_Data/";
+    output_location = "/home/fardousr/Desktop/Output/Collimator_Data/";//"/home/fardousr/Desktop/Output/Collimator_Data/";
     // output_filename = "Coll_Energy_"+std::to_string((G4int)beam_energy)+"_Alpha:_"+(std::to_string(beam_alpha_x)).substr (0,3)+
     //                          "_Beta:_"+(std::to_string(beam_beta_x)).substr (0,5)+"mm_Radius_"+(std::to_string(collimator_radius)).substr (0,3)+"mm"+".root";
     output_filename = "Coll_Energy_"+std::to_string((G4int)beam_energy)+"MeV_Radius_"+(std::to_string(collimator_radius)).substr (0,3)+"mm"+".root";
@@ -45,7 +44,7 @@ ActionInitialization::ActionInitialization(G4double   beam_energy_input,
   else
   {
     output_location = "/home/fardousr/Desktop/Output/Convergent_Data/";
-    output_filename = "Boron_Energy_"+std::to_string((G4int)beam_energy)+"_Alpha:_"+(std::to_string(beam_alpha_x)).substr (0,3)+
+    output_filename = "Energy_"+std::to_string((G4int)beam_energy)+"_Alpha:_"+(std::to_string(beam_alpha_x)).substr (0,3)+
                              "_Beta:_"+(std::to_string(beam_beta_x)).substr (0,5)+"mm_Sigma_"+(std::to_string(beam_sigma_x)).substr (0,3)+"mm"+".root";
     // output_filename = "Energy_"+std::to_string((G4int)beam_energy)+"_Alpha:_x_"+(std::to_string(beam_alpha_x)).substr (0,3)+"_y_"+(std::to_string(beam_alpha_y)).substr (0,3)+
     //                        "_Beta:_x_"+(std::to_string(beam_beta_x)).substr (0,5)+"mm_y_"+(std::to_string(beam_beta_x)).substr (0,5)+"mm_y_"+".root";
@@ -59,7 +58,7 @@ ActionInitialization::~ActionInitialization()
 void ActionInitialization::BuildForMaster() const
 {
 
-    RunAction* runAction = new RunAction(Output_File);
+    RunAction* runAction = new RunAction(Output_File, beam_energy);
     SetUserAction(runAction);
 }
 
@@ -76,7 +75,8 @@ void ActionInitialization::Build() const
                                                                               gun_z_position);
   SetUserAction(primaryGeneratorAction);
 
-  RunAction* runAction = new RunAction(Output_File);
+  RunAction* runAction = new RunAction(Output_File,
+                                       beam_energy);
   SetUserAction(runAction);
 
   EventAction* eventAction = new EventAction(runAction);
